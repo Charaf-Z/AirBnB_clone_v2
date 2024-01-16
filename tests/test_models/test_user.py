@@ -1,8 +1,6 @@
 #!/usr/bin/python3
 """Defines the unittests for the User model."""
 import os
-
-# from sqlalchemy import Column
 from tests.test_models.test_base_model import TestBasemodel
 from models.user import User
 
