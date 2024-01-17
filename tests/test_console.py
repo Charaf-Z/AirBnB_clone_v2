@@ -168,6 +168,23 @@ class TestHBNBCommand(unittest.TestCase):
         self.assertIsNotNone(HBNBCommand.strip_clean.__doc__)
         self.assertIsNotNone(HBNBCommand.default.__doc__)
 
+    @classmethod
+    def setUpClass(cls):
+        """Set up for the test."""
+        cls.consol = HBNBCommand()
+
+    @classmethod
+    def teardown(cls):
+        """At the end of the test this will tear it down."""
+        del cls.consol
+
+    def tearDown(self):
+        """Remove temporary file (file.json) created as a result."""
+        try:
+            os.remove("file.json")
+        except Exception:
+            pass
+
     def test_emptyline(self):
         """Test empty line input."""
         with patch('sys.stdout', new=StringIO()) as f:
