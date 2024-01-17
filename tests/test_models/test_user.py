@@ -1,11 +1,11 @@
 #!/usr/bin/python3
 """Defines the unittests for the User model."""
 import os
-from tests.test_models.test_base_model import TestBasemodel
+from tests.test_models.test_base_model import test_basemodel
 from models.user import User
 
 
-class TestUser(TestBasemodel):
+class test_user(test_basemodel):
     """A unittest for User class."""
 
     def __init__(self, *args, **kwargs):

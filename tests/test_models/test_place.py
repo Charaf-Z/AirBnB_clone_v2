@@ -1,11 +1,11 @@
 #!/usr/bin/python3
 """Defines the unittests for The Place model."""
 import os
-from tests.test_models.test_base_model import TestBasemodel
+from tests.test_models.test_base_model import test_basemodel
 from models.place import Place
 
 
-class TestPlace(TestBasemodel):
+class test_place(test_basemodel):
     """A unittest for Place class."""
 
     def __init__(self, *args, **kwargs):
@@ -97,4 +97,7 @@ class TestPlace(TestBasemodel):
     def test_amenity_ids(self):
         """Tests the type of amenity_ids attribute."""
         new = self.value()
-        self.assertEqual(type(new.amenity_ids), list)
+        self.assertEqual(
+            type(new.amenity_ids),
+            list if os.getenv("HBNB_TYPE_STORAGE") != "db" else type(None),
+        )

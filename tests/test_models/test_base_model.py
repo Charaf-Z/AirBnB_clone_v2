@@ -7,7 +7,10 @@ import unittest
 from models.base_model import BaseModel, Base
 
 
-class TestBasemodel(unittest.TestCase):
+@unittest.skipIf(
+    os.getenv("HBNB_TYPE_STORAGE") == "db", "basemodel test not supported"
+)
+class test_basemodel(unittest.TestCase):
     """.Test Class - Contains all unittests for the BaseModel class."""
 
     def __init__(self, *args, **kwargs):

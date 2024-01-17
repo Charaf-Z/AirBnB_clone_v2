@@ -1,11 +1,11 @@
 #!/usr/bin/python3
 """This module instantiates an object of storage engine."""
 import os
-from tests.test_models.test_base_model import TestBasemodel
+from tests.test_models.test_base_model import test_basemodel
 from models.amenity import Amenity
 
 
-class TestAmenity(TestBasemodel):
+class test_amenity(test_basemodel):
     """Test the Amenity class and its methods."""
 
     def __init__(self, *args, **kwargs):

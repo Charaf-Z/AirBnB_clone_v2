@@ -3,10 +3,10 @@
 
 import os
 from models.city import City
-from tests.test_models.test_base_model import TestBasemodel
+from tests.test_models.test_base_model import test_basemodel
 
 
-class TestCity(TestBasemodel):
+class test_city(test_basemodel):
     """A unittest for City class."""
 
     def __init__(self, *args, **kwargs):
