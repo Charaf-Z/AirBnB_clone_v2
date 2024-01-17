@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """Defines the unittests for the City model."""
-
+import unittest
 import os
 from models.city import City
 from tests.test_models.test_base_model import test_basemodel
@@ -30,3 +30,7 @@ class test_city(test_basemodel):
             type(new.name),
             str if os.getenv("HBNB_TYPE_STORAGE") != "db" else type(None),
         )
+
+
+if __name__ == "__main__":
+    unittest.main()

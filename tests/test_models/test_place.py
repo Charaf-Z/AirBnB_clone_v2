@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """Defines the unittests for The Place model."""
 import os
+import unittest
 from tests.test_models.test_base_model import test_basemodel
 from models.place import Place
 
@@ -101,3 +102,7 @@ class test_place(test_basemodel):
             type(new.amenity_ids),
             list if os.getenv("HBNB_TYPE_STORAGE") != "db" else type(None),
         )
+
+
+if __name__ == "__main__":
+    unittest.main()

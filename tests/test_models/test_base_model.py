@@ -152,3 +152,6 @@ class test_basemodel(unittest.TestCase):
         i.delete()
         self.assertFalse(i in storage.all().values())
 
+
+if __name__ == "__main__":
+    unittest.main()
