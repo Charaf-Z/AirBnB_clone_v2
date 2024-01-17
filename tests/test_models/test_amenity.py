@@ -1,60 +1,23 @@
 #!/usr/bin/python3
-"""Test cases for amenities"""
-import unittest
+"""This module instantiates an object of storage engine."""
 import os
+from tests.test_models.test_base_model import test_basemodel
 from models.amenity import Amenity
-from models.base_model import BaseModel
 
 
-class TestAmenity(unittest.TestCase):
-    """this will test the Amenity class"""
+class test_amenity(test_basemodel):
+    """Test the Amenity class and its methods."""
 
-    @classmethod
-    def setUpClass(cls):
-        """set up for test"""
-        cls.amenity = Amenity()
-        cls.amenity.name = "WiFi"
+    def __init__(self, *args, **kwargs):
+        """Initialize the test class for Amenity."""
+        super().__init__(*args, **kwargs)
+        self.name = "Amenity"
+        self.value = Amenity
 
-    @classmethod
-    def teardown(cls):
-        """at the end of the test this will tear it down"""
-        del cls.amenity
-
-    def tearDown(self):
-        """teardown"""
-        try:
-            os.remove("file.json")
-        except Exception:
-            pass
-
-    def test_checking_for_docstring_amenity(self):
-        """checking for docstrings"""
-        self.assertIsNotNone(Amenity.__doc__)
-
-    def test_attributes_amenity(self):
-        """chekcing if amenity have attibutes"""
-        self.assertTrue('id' in self.amenity.__dict__)
-        self.assertTrue('created_at' in self.amenity.__dict__)
-        self.assertTrue('updated_at' in self.amenity.__dict__)
-        self.assertTrue('name' in self.amenity.__dict__)
-
-    def test_is_subclass_amenity(self):
-        """test if Amenity is subclass of Basemodel"""
-        self.assertTrue(issubclass(self.amenity.__class__, BaseModel), True)
-
-    def test_attribute_types_amenity(self):
-        """test attribute type for Amenity"""
-        self.assertEqual(type(self.amenity.name), str)
-
-    def test_save_amenity(self):
-        """test if the save works"""
-        self.amenity.save()
-        self.assertNotEqual(self.amenity.created_at, self.amenity.updated_at)
-
-    def test_to_dict_amenity(self):
-        """test if dictionary works"""
-        self.assertEqual('to_dict' in dir(self.amenity), True)
-
-
-if __name__ == "__main__":
-    unittest.main()
+    def test_name2(self):
+        """Tests the type of name attribute."""
+        new = self.value()
+        if os.getenv("HBNB_TYPE_STORAGE") == "db":
+            self.assertNotEqual(type(new.name), str)
+        else:
+            self.assertEqual(type(new.name), type(None))
