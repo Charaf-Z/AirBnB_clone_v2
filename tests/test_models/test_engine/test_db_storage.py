@@ -1,112 +1,191 @@
 #!/usr/bin/python3
 """Defines the unittests for the DB_storage model."""
-import unittest
-from os import getenv
-from models.user import User
-from models.state import State
-from models.engine.db_storage import DBStorage
-from models import storage
+
 import MySQLdb
-import pep8
+import os
+import unittest
+from datetime import datetime
+from models import storage
+from models.user import User
 
 
+@unittest.skipIf(os.getenv("HBNB_TYPE_STORAGE") != "db", "DBStorage test")
 class TestDBStorage(unittest.TestCase):
-    """this will test the DBStorage."""
+    """A unittest for DBStorage class."""
 
-    @unittest.skipIf(
-        getenv("HBNB_TYPE_STORAGE") != "db", "can't run if storage is file"
-    )
-    def setUp(self):
-        """Set up for test."""
-        if getenv("HBNB_TYPE_STORAGE") == "db":
-            self.db = MySQLdb.connect(
-                getenv("HBNB_MYSQL_HOST"),
-                getenv("HBNB_MYSQL_USER"),
-                getenv("HBNB_MYSQL_PWD"),
-                getenv("HBNB_MYSQL_DB"),
-            )
-            self.cursor = self.db.cursor()
+    def test_new(self):
+        """Tests the new method."""
+        new = User(
+            email="john2020@gmail.com",
+            password="password",
+            first_name="John",
+            last_name="Zoldyck",
+        )
+        self.assertFalse(new in storage.all().values())
+        new.save()
+        self.assertTrue(new in storage.all().values())
+        dbc = MySQLdb.connect(
+            host=os.getenv("HBNB_MYSQL_HOST"),
+            port=3306,
+            user=os.getenv("HBNB_MYSQL_USER"),
+            passwd=os.getenv("HBNB_MYSQL_PWD"),
+            db=os.getenv("HBNB_MYSQL_DB"),
+        )
+        cursor = dbc.cursor()
+        cursor.execute('SELECT * FROM users WHERE id="{}"'.format(new.id))
+        result = cursor.fetchone()
+        self.assertTrue(result is not None)
+        self.assertIn("john2020@gmail.com", result)
+        self.assertIn("password", result)
+        self.assertIn("John", result)
+        self.assertIn("Zoldyck", result)
+        cursor.close()
+        dbc.close()
 
-    @unittest.skipIf(
-        getenv("HBNB_TYPE_STORAGE") != "db", "can't run if storage is file"
-    )
-    def tearDown(self):
-        """Set the end of the test this will tear it down."""
-        if getenv("HBNB_TYPE_STORAGE") == "db":
-            self.db.close()
+    def test_delete(self):
+        """Tests the delete method."""
+        new = User(
+            email="john2020@gmail.com",
+            password="password",
+            first_name="John",
+            last_name="Zoldyck",
+        )
+        obj_key = "User.{}".format(new.id)
+        dbc = MySQLdb.connect(
+            host=os.getenv("HBNB_MYSQL_HOST"),
+            port=3306,
+            user=os.getenv("HBNB_MYSQL_USER"),
+            passwd=os.getenv("HBNB_MYSQL_PWD"),
+            db=os.getenv("HBNB_MYSQL_DB"),
+        )
+        new.save()
+        self.assertTrue(new in storage.all().values())
+        cursor = dbc.cursor()
+        cursor.execute('SELECT * FROM users WHERE id="{}"'.format(new.id))
+        result = cursor.fetchone()
+        self.assertTrue(result is not None)
+        self.assertIn("john2020@gmail.com", result)
+        self.assertIn("password", result)
+        self.assertIn("John", result)
+        self.assertIn("Zoldyck", result)
+        self.assertIn(obj_key, storage.all(User).keys())
+        new.delete()
+        self.assertNotIn(obj_key, storage.all(User).keys())
+        cursor.close()
+        dbc.close()
 
-    @unittest.skipIf(
-        getenv("HBNB_TYPE_STORAGE") != "db", "can't run if storage is file"
-    )
-    def test_pep8_DBStorage(self):
-        """Testing for pep8."""
-        style = pep8.StyleGuide(quiet=True)
-        p = style.check_files(["models/engine/db_storage.py"])
-        self.assertEqual(p.total_errors, 0, "fix pep8")
-
-    @unittest.skipIf(
-        getenv("HBNB_TYPE_STORAGE") != "db", "can't run if storage is file"
-    )
-    def test_attributes_DBStorage(self):
-        """Tests for class attributes."""
-        self.assertTrue(hasattr(DBStorage, "_DBStorage__engine"))
-        self.assertTrue(hasattr(DBStorage, "_DBStorage__session"))
-        self.assertTrue(hasattr(DBStorage, "all"))
-        self.assertTrue(hasattr(DBStorage, "new"))
-        self.assertTrue(hasattr(DBStorage, "save"))
-        self.assertTrue(hasattr(DBStorage, "delete"))
-        self.assertTrue(hasattr(DBStorage, "reload"))
-
-    @unittest.skipIf(
-        getenv("HBNB_TYPE_STORAGE") != "db", "can't run if storage is file"
-    )
-    def test_all_DBStorage(self):
-        """Tests for all() method."""
-        s = State(name="California")
-        storage.new(s)
-        storage.save()
-        k = "{}.{}".format(type(s).__name__, s.id)
-        dic = storage.all(State)
-        self.assertTrue(k in dic.keys())
-        s1 = State(name="Arizona")
-        storage.new(s1)
-        storage.save()
-        k1 = "{}.{}".format(type(s1).__name__, s1.id)
-        dic1 = storage.all()
-        self.assertTrue(k in dic1.keys())
-        self.assertTrue(k1 in dic1.keys())
-        u = User(email="derps@herps.com", password="hurrdurr")
-        storage.new(u)
-        storage.save()
-        k2 = "{}.{}".format(type(u).__name__, u.id)
-        dic2 = storage.all(User)
-        self.assertTrue(k2 in dic2.keys())
-        self.assertFalse(k1 in dic2.keys())
-        self.assertFalse(k in dic2.keys())
-        self.assertFalse(k2 in dic.keys())
-
-    @unittest.skipIf(
-        getenv("HBNB_TYPE_STORAGE") != "db", "can't run if storage is file"
-    )
-    def test_new_DBStorage(self):
-        """Tests for new() method."""
-        nb = self.cursor.execute("SELECT COUNT(*) FROM states")
-        s = State(name="Oregon")
-        s.save()
-        nb1 = self.cursor.execute("SELECT COUNT(*) FROM states")
-        self.assertEqual(nb1 - nb, 0)
-
-    @unittest.skipIf(
-        getenv("HBNB_TYPE_STORAGE") != "db", "can't run if storage is file"
-    )
     def test_reload(self):
-        """Test for reload()."""
-        obj = DBStorage()
-        self.assertTrue(obj._DBStorage__engine is not None)
-        self.assertTrue(obj._DBStorage__session is None)
-        obj.reload()
-        self.assertTrue(obj._DBStorage__session is not None)
+        """Tests the reload method."""
+        dbc = MySQLdb.connect(
+            host=os.getenv("HBNB_MYSQL_HOST"),
+            port=3306,
+            user=os.getenv("HBNB_MYSQL_USER"),
+            passwd=os.getenv("HBNB_MYSQL_PWD"),
+            db=os.getenv("HBNB_MYSQL_DB"),
+        )
+        cursor = dbc.cursor()
+        cursor.execute(
+            "INSERT INTO users(id, created_at, updated_at, email, password"
+            + ", first_name, last_name) VALUES(%s, %s, %s, %s, %s, %s, %s);",
+            [
+                "4447-by-me",
+                str(datetime.now()),
+                str(datetime.now()),
+                "ben_pike@yahoo.com",
+                "pass",
+                "Benjamin",
+                "Pike",
+            ],
+        )
+        self.assertNotIn("User.4447-by-me", storage.all())
+        dbc.commit()
+        storage.reload()
+        self.assertIn("User.4447-by-me", storage.all())
+        cursor.close()
+        dbc.close()
 
+    def test_save(self):
+        """Tests the save method."""
+        new = User(
+            email="john2020@gmail.com",
+            password="password",
+            first_name="John",
+            last_name="Zoldyck",
+        )
+        dbc = MySQLdb.connect(
+            host=os.getenv("HBNB_MYSQL_HOST"),
+            port=3306,
+            user=os.getenv("HBNB_MYSQL_USER"),
+            passwd=os.getenv("HBNB_MYSQL_PWD"),
+            db=os.getenv("HBNB_MYSQL_DB"),
+        )
+        cursor = dbc.cursor()
+        cursor.execute('SELECT * FROM users WHERE id="{}"'.format(new.id))
+        result = cursor.fetchone()
+        cursor.execute("SELECT COUNT(*) FROM users;")
+        old_cnt = cursor.fetchone()[0]
+        self.assertTrue(result is None)
+        self.assertFalse(new in storage.all().values())
+        new.save()
+        dbc1 = MySQLdb.connect(
+            host=os.getenv("HBNB_MYSQL_HOST"),
+            port=3306,
+            user=os.getenv("HBNB_MYSQL_USER"),
+            passwd=os.getenv("HBNB_MYSQL_PWD"),
+            db=os.getenv("HBNB_MYSQL_DB"),
+        )
+        cursor1 = dbc1.cursor()
+        cursor1.execute('SELECT * FROM users WHERE id="{}"'.format(new.id))
+        result = cursor1.fetchone()
+        cursor1.execute("SELECT COUNT(*) FROM users;")
+        new_cnt = cursor1.fetchone()[0]
+        self.assertFalse(result is None)
+        self.assertEqual(old_cnt + 1, new_cnt)
+        self.assertTrue(new in storage.all().values())
+        cursor1.close()
+        dbc1.close()
+        cursor.close()
+        dbc.close()
 
-if __name__ == "__main__":
-    unittest.main()
+    def test_storage_var_created(self):
+        """Tests if the storage variable is created."""
+        from models.engine.db_storage import DBStorage
+
+        self.assertEqual(type(storage), DBStorage)
+
+    def test_new_and_save(self):
+        """Testing the new and save methods."""
+        db = MySQLdb.connect(
+            user=os.getenv("HBNB_MYSQL_USER"),
+            host=os.getenv("HBNB_MYSQL_HOST"),
+            passwd=os.getenv("HBNB_MYSQL_PWD"),
+            port=3306,
+            db=os.getenv("HBNB_MYSQL_DB"),
+        )
+        new_user = User(
+            **{
+                "first_name": "jack",
+                "last_name": "bond",
+                "email": "jack@bond.com",
+                "password": 12345,
+            }
+        )
+        cur = db.cursor()
+        cur.execute("SELECT COUNT(*) FROM users")
+        old_count = cur.fetchall()
+        cur.close()
+        db.close()
+        new_user.save()
+        db = MySQLdb.connect(
+            user=os.getenv("HBNB_MYSQL_USER"),
+            host=os.getenv("HBNB_MYSQL_HOST"),
+            passwd=os.getenv("HBNB_MYSQL_PWD"),
+            port=3306,
+            db=os.getenv("HBNB_MYSQL_DB"),
+        )
+        cur = db.cursor()
+        cur.execute("SELECT COUNT(*) FROM users")
+        new_count = cur.fetchall()
+        self.assertEqual(new_count[0][0], old_count[0][0] + 1)
+        cur.close()
+        db.close()
