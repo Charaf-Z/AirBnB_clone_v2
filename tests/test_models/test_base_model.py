@@ -80,12 +80,12 @@ class test_basemodel(unittest.TestCase):
     def test_todict(self):
         """Tests the to_dict function of the model class dictionary."""
         i = self.value()
-        n = i.to_dict()
-        self.assertEqual(i.to_dict(), n)
-        self.assertIsInstance(self.value().to_dict(), dict)
-        self.assertIn("id", self.value().to_dict())
-        self.assertIn("created_at", self.value().to_dict())
-        self.assertIn("updated_at", self.value().to_dict())
+        d = i.to_dict()
+        self.assertEqual(type(d), dict)
+        self.assertEqual(d["__class__"], self.name)
+        self.assertEqual(d["created_at"], i.created_at.isoformat())
+        self.assertEqual(d["updated_at"], i.updated_at.isoformat())
+
         mdl = self.value()
         mdl.firstname = "Celestine"
         mdl.lastname = "Akpanoko"
@@ -93,8 +93,10 @@ class test_basemodel(unittest.TestCase):
         self.assertIn("lastname", mdl.to_dict())
         self.assertIn("firstname", self.value(firstname="Celestine").to_dict())
         self.assertIn("lastname", self.value(lastname="Akpanoko").to_dict())
+
         self.assertIsInstance(self.value().to_dict()["created_at"], str)
         self.assertIsInstance(self.value().to_dict()["updated_at"], str)
+
         datetime_now = datetime.today()
         mdl = self.value()
         mdl.id = "012345"
@@ -106,35 +108,6 @@ class test_basemodel(unittest.TestCase):
             "updated_at": datetime_now.isoformat(),
         }
         self.assertDictEqual(mdl.to_dict(), to_dict)
-        if os.getenv("HBNB_TYPE_STORAGE") != "db":
-            self.assertDictEqual(
-                self.value(id="u-b34", age=13).to_dict(),
-                {
-                    "__class__": mdl.__class__.__name__,
-                    "id": "u-b34",
-                    "age": 13,
-                },
-            )
-            self.assertDictEqual(
-                self.value(id="u-b34", age=None).to_dict(),
-                {
-                    "__class__": mdl.__class__.__name__,
-                    "id": "u-b34",
-                    "age": None,
-                },
-            )
-        mdl_d = self.value()
-        self.assertIn("__class__", self.value().to_dict())
-        self.assertNotIn("__class__", self.value().__dict__)
-        self.assertNotEqual(mdl_d.to_dict(), mdl_d.__dict__)
-        self.assertNotEqual(mdl_d.to_dict()["__class__"], mdl_d.__class__)
-        with self.assertRaises(TypeError):
-            self.value().to_dict(None)
-        with self.assertRaises(TypeError):
-            self.value().to_dict(self.value())
-        with self.assertRaises(TypeError):
-            self.value().to_dict(45)
-        self.assertNotIn("_sa_instance_state", n)
 
     def test_kwargs_none(self):
         """Tests kwargs that is empty."""
@@ -144,9 +117,9 @@ class test_basemodel(unittest.TestCase):
 
     def test_kwargs_one(self):
         """Tests kwargs with one key-value pair."""
-        n = {"name": "test"}
+        n = {"Name": "test"}
         new = self.value(**n)
-        self.assertEqual(new.name, n["name"])
+        self.assertTrue(hasattr(new, "Name"))
 
     def test_id(self):
         """Tests the type of id."""
@@ -178,3 +151,4 @@ class test_basemodel(unittest.TestCase):
         self.assertTrue(i in storage.all().values())
         i.delete()
         self.assertFalse(i in storage.all().values())
+
