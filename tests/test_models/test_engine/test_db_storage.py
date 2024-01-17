@@ -32,7 +32,7 @@ class TestDBStorage(unittest.TestCase):
             db=os.getenv("HBNB_MYSQL_DB"),
         )
         cursor = dbc.cursor()
-        cursor.execute('SELECT * FROM users WHERE id="{}"'.format(new.id))
+        cursor.execute("SELECT * FROM `users` WHERE `id`=%s", (new.id,))
         result = cursor.fetchone()
         self.assertTrue(result is not None)
         self.assertIn("john2020@gmail.com", result)
@@ -61,7 +61,7 @@ class TestDBStorage(unittest.TestCase):
         new.save()
         self.assertTrue(new in storage.all().values())
         cursor = dbc.cursor()
-        cursor.execute('SELECT * FROM users WHERE id="{}"'.format(new.id))
+        cursor.execute("SELECT * FROM `users` WHERE `id`=%s", (new.id,))
         result = cursor.fetchone()
         self.assertTrue(result is not None)
         self.assertIn("john2020@gmail.com", result)
@@ -85,8 +85,9 @@ class TestDBStorage(unittest.TestCase):
         )
         cursor = dbc.cursor()
         cursor.execute(
-            "INSERT INTO users(id, created_at, updated_at, email, password"
-            + ", first_name, last_name) VALUES(%s, %s, %s, %s, %s, %s, %s);",
+            """INSERT INTO `users`(`id`, `created_at`, `updated_at`,
+            `email`, `password`, `first_name`, `last_name`)
+            VALUES(%s, %s, %s, %s, %s, %s, %s);""",
             [
                 "4447-by-me",
                 str(datetime.now()),
@@ -120,9 +121,9 @@ class TestDBStorage(unittest.TestCase):
             db=os.getenv("HBNB_MYSQL_DB"),
         )
         cursor = dbc.cursor()
-        cursor.execute('SELECT * FROM users WHERE id="{}"'.format(new.id))
+        cursor.execute("SELECT * FROM `users` WHERE `id`=%s", (new.id,))
         result = cursor.fetchone()
-        cursor.execute("SELECT COUNT(*) FROM users;")
+        cursor.execute("SELECT COUNT(*) FROM `users`;")
         old_cnt = cursor.fetchone()[0]
         self.assertTrue(result is None)
         self.assertFalse(new in storage.all().values())
@@ -135,9 +136,9 @@ class TestDBStorage(unittest.TestCase):
             db=os.getenv("HBNB_MYSQL_DB"),
         )
         cursor1 = dbc1.cursor()
-        cursor1.execute('SELECT * FROM users WHERE id="{}"'.format(new.id))
+        cursor.execute("SELECT * FROM `users` WHERE `id`=%s", (new.id,))
         result = cursor1.fetchone()
-        cursor1.execute("SELECT COUNT(*) FROM users;")
+        cursor1.execute("SELECT COUNT(*) FROM `users`;")
         new_cnt = cursor1.fetchone()[0]
         self.assertFalse(result is None)
         self.assertEqual(old_cnt + 1, new_cnt)
@@ -171,7 +172,7 @@ class TestDBStorage(unittest.TestCase):
             }
         )
         cur = db.cursor()
-        cur.execute("SELECT COUNT(*) FROM users")
+        cur.execute("SELECT COUNT(*) FROM `users`")
         old_count = cur.fetchall()
         cur.close()
         db.close()
@@ -184,7 +185,7 @@ class TestDBStorage(unittest.TestCase):
             db=os.getenv("HBNB_MYSQL_DB"),
         )
         cur = db.cursor()
-        cur.execute("SELECT COUNT(*) FROM users")
+        cur.execute("SELECT COUNT(*) FROM `users`")
         new_count = cur.fetchall()
         self.assertEqual(new_count[0][0], old_count[0][0] + 1)
         cur.close()
