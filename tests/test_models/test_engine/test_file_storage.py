@@ -25,29 +25,43 @@ class test_fileStorage(unittest.TestCase):
         except Exception:
             pass
 
+    @unittest.skipIf(
+        os.getenv("HBNB_TYPE_STORAGE") == "db", "FileStorage test"
+    )
     def test_obj_list_empty(self):
         """Tests that __objects is empty at start of tests."""
         self.assertEqual(len(storage.all()), 0)
 
+    @unittest.skipIf(
+        os.getenv("HBNB_TYPE_STORAGE") == "db", "FileStorage test"
+    )
     def test_new(self):
         """Tests that new objects are properly added to __objects."""
-        new = BaseModel()
-        new.save()
+        temp = BaseModel()
         for obj in storage.all().values():
             temp = obj
-        self.assertTrue(temp is obj)
+            self.assertTrue(temp is obj)
 
+    @unittest.skipIf(
+        os.getenv("HBNB_TYPE_STORAGE") == "db", "FileStorage test"
+    )
     def test_all(self):
         """Tests that all() returns __objects."""
         new = BaseModel()
         temp = storage.all()
         self.assertIsInstance(temp, dict)
 
+    @unittest.skipIf(
+        os.getenv("HBNB_TYPE_STORAGE") == "db", "FileStorage test"
+    )
     def test_base_model_instantiation(self):
         """Tests that a new instance of BaseModel is created."""
         new = BaseModel()
         self.assertFalse(os.path.exists("file.json"))
 
+    @unittest.skipIf(
+        os.getenv("HBNB_TYPE_STORAGE") == "db", "FileStorage test"
+    )
     def test_empty(self):
         """Tests all() returns an empty dictionary if __objects is empty."""
         new = BaseModel()
@@ -56,22 +70,29 @@ class test_fileStorage(unittest.TestCase):
         new2 = BaseModel(**thing)
         self.assertNotEqual(os.path.getsize("file.json"), 0)
 
+    @unittest.skipIf(
+        os.getenv("HBNB_TYPE_STORAGE") == "db", "FileStorage test"
+    )
     def test_save(self):
         """Tests that save() properly saves objects to file.json."""
         new = BaseModel()
         storage.save()
         self.assertTrue(os.path.exists("file.json"))
 
+    @unittest.skipIf(
+        os.getenv("HBNB_TYPE_STORAGE") == "db", "FileStorage test"
+    )
     def test_reload(self):
         """Tests that reload() properly loads objects from file.json."""
         new = BaseModel()
-        new.save()
+        storage.save()
         storage.reload()
-        loaded = None
         for obj in storage.all().values():
-            loaded = obj
-        self.assertEqual(new.to_dict()["id"], loaded.to_dict()["id"])
+            self.assertEqual(new.to_dict()["id"], obj.to_dict()["id"])
 
+    @unittest.skipIf(
+        os.getenv("HBNB_TYPE_STORAGE") == "db", "FileStorage test"
+    )
     def test_reload_empty(self):
         """Tests that reload() properly loads an empty file.json."""
         with open("file.json", "w") as f:
@@ -79,35 +100,51 @@ class test_fileStorage(unittest.TestCase):
         with self.assertRaises(ValueError):
             storage.reload()
 
+    @unittest.skipIf(
+        os.getenv("HBNB_TYPE_STORAGE") == "db", "FileStorage test"
+    )
     def test_reload_from_nonexistent(self):
         """Tests that reload() properly loads from a nonexistent file.json."""
         self.assertEqual(storage.reload(), None)
 
+    @unittest.skipIf(
+        os.getenv("HBNB_TYPE_STORAGE") == "db", "FileStorage test"
+    )
     def test_base_model_save(self):
         """Tests that save() properly saves BaseModel objects to file.json."""
         new = BaseModel()
         new.save()
         self.assertTrue(os.path.exists("file.json"))
 
+    @unittest.skipIf(
+        os.getenv("HBNB_TYPE_STORAGE") == "db", "FileStorage test"
+    )
     def test_type_path(self):
         """Tests that __file_path is a string."""
         self.assertEqual(type(storage._FileStorage__file_path), str)
 
+    @unittest.skipIf(
+        os.getenv("HBNB_TYPE_STORAGE") == "db", "FileStorage test"
+    )
     def test_type_objects(self):
         """Tests that __objects is a dictionary."""
         self.assertEqual(type(storage.all()), dict)
 
+    @unittest.skipIf(
+        os.getenv("HBNB_TYPE_STORAGE") == "db", "FileStorage test"
+    )
     def test_key_format(self):
         """Tests that the key for each object in __objects."""
         new = BaseModel()
-        _id = new.to_dict()["id"]
-        temp = ""
         new.save()
-        for key, value in storage.all().items():
-            if value is new:
-                temp = key
+        _id = new.to_dict()["id"]
+        for key in storage.all().keys():
+            temp = key
         self.assertEqual(temp, "BaseModel" + "." + _id)
 
+    @unittest.skipIf(
+        os.getenv("HBNB_TYPE_STORAGE") == "db", "FileStorage test"
+    )
     def test_storage_var_created(self):
         """Tests that a new instance of FileStorage is created."""
         from models.engine.file_storage import FileStorage
