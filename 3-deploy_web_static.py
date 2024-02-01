@@ -19,14 +19,13 @@ def do_pack():
         str: The file path of the created archive,
             or None if the process fails.
     """
-    local("sudo mkdir -p versions")
     date = datetime.now().strftime("%Y%m%d%H%M%S")
-    filename = "versions/web_static_{}.tgz".format(date)
-    result = local("sudo tar -cvzf {} web_static".format(filename))
-    if result.succeeded:
-        return filename
-    else:
+    file_name = "versions/web_static_{}.tgz".format(date)
+    if local("sudo mkdir -p versions").failed is True:
         return None
+    if local("sudo tar -cvzf {} web_static".format(file_name)).failed is True:
+        return None
+    return file_name
 
 
 def do_deploy(archive_path):
