@@ -16,7 +16,7 @@ echo "<html>
 
 ln -sf /data/web_static/releases/test/ /data/web_static/current
 
-chmod -hR ubuntu:ubuntu /data/
+chown -hR ubuntu:ubuntu /data/
 
 echo "server {
     listen      80 default_server;
@@ -28,7 +28,7 @@ echo "server {
     server_name _;
     add_header X-Served-By $HOSTNAME;
 
-    location /hbnh_static {
+    location /hbnb_static {
         alias /data/web_static/current;
         index index.html index.htm;
     }
