@@ -29,8 +29,8 @@ def do_pack():
     print(f"Packing web_static to {file_name}")
     try:
         if not exists("versions"):
-            local("sudo mkdir -p versions")
-        local("sudo tar -cvzf {} web_static".format(file_name))
+            local("mkdir -p versions")
+        local("tar -cvzf {} web_static".format(file_name))
         print(f"web_static packed: {file_name} -> {getsize(file_name)}Bytes")
         created_archive = file_name
         return file_name
