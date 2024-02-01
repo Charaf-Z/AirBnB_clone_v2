@@ -3,7 +3,6 @@
 from fabric.api import *
 from datetime import datetime
 from os.path import exists
-from os.path import isdir
 from os.path import basename
 
 
@@ -20,14 +19,14 @@ def do_pack():
         str: The file path of the created archive,
             or None if the process fails.
     """
+    local("sudo mkdir -p versions")
     date = datetime.now().strftime("%Y%m%d%H%M%S")
-    file_name = "versions/web_static_{}.tgz".format(date)
-    if isdir("versions") is False:
-        if local("mkdir -p versions").failed is False:
-            return None
-    if local("tar -cvzf {} web_static".format(file_name)).failed is True:
+    filename = "versions/web_static_{}.tgz".format(date)
+    result = local("sudo tar -cvzf {} web_static".format(filename))
+    if result.succeeded:
+        return filename
+    else:
         return None
-    return file_name
 
 
 def do_deploy(archive_path):
