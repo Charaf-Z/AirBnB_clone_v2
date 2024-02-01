@@ -1,8 +1,11 @@
 #!/usr/bin/python3
 """Deploy web_static content to remote servers."""
 from datetime import datetime
-from os.path import *
-from fabric.api import *
+from fabric.api import env
+from fabric.api import put
+from fabric.api import run
+from fabric.api import local
+from os.path import isfile, basename
 
 
 env.hosts = ["18.234.129.123", "52.3.244.13"]
@@ -20,10 +23,14 @@ def do_pack():
     """
     date = datetime.now().strftime("%Y%m%d%H%M%S")
     file_name = "versions/web_static_{}.tgz".format(date)
-    if local("sudo mkdir -p versions").failed is True:
+    if isfile(file_name):
+        return file_name
+    if isdir("version") is False:
+        if local("mkdir -p versions").failed is False:
+            return None
+    if local("tar -cvzf {} web_static".format(file_name)).failed is True:
         return None
-    if local("sudo tar -cvzf {} web_static".format(file_name)).failed is True:
-        return None
+    print("Packing web_static to {}")
     return file_name
 
 
@@ -63,7 +70,10 @@ def do_deploy(archive_path):
             return False
         if run("rm -rf /data/web_static/current").failed is True:
             return False
-        if run("ln -s {} /data/web_static/current".format(file)).failed is True:
+        if (
+            run("ln -s {} /data/web_static/current".format(file)).failed
+            is True
+        ):
             return False
         print("New version deployed!")
         return True
