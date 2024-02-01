@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """Automated deployment script for web_static content."""
 from datetime import datetime
-from os.path import isfile, basename
+from os.path import isfile, basename, isdir
 from fabric.api import local, env, put, run
 
 env.hosts = ["18.234.129.123", "52.3.244.13"]
@@ -19,10 +19,14 @@ def do_pack():
     """
     date = datetime.now().strftime("%Y%m%d%H%M%S")
     file_name = "versions/web_static_{}.tgz".format(date)
-    if local("sudo mkdir -p versions").failed is True:
+    if isfile(file_name):
+        return file_name
+    if isdir('version') is False:
+        if local("mkdir -p versions").failed is False:
+            return None
+    if local("tar -cvzf {} web_static".format(file_name)).failed is True:
         return None
-    if local("sudo tar -cvzf {} web_static".format(file_name)).failed is True:
-        return None
+    print("Packing web_static to {}")
     return file_name
 
 
