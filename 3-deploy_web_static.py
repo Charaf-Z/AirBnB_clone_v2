@@ -74,6 +74,7 @@ def deploy():
     Returns:
         bool: True if the deployment process succeeds, False otherwise.
     """
+    global created_archive
     if created_archive is not None:
         return do_deploy(created_archive)
     file_path = do_pack()
