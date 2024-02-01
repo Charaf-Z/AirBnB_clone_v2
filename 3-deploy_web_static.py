@@ -21,6 +21,9 @@ def do_pack():
         str: The file path of the created archive,
             or None if the process fails.
     """
+    global created_archive
+    if created_archive is not None:
+        return created_archive
     date = datetime.now().strftime("%Y%m%d%H%M%S")
     file_name = "versions/web_static_{}.tgz".format(date)
     print(f"Packing web_static to {file_name}")
@@ -29,6 +32,7 @@ def do_pack():
             local("sudo mkdir -p versions")
         local("sudo tar -cvzf {} web_static".format(file_name))
         print(f"Packing web_static to: {file_name} -> {getsize(file_name)}")
+        created_archive = file_name
         return file_name
     except Exception:
         return None
@@ -74,12 +78,8 @@ def deploy():
     Returns:
         bool: True if the deployment process succeeds, False otherwise.
     """
-    global created_archive
-    if created_archive is not None:
-        return do_deploy(created_archive)
     file_path = do_pack()
     if not exists(file_path):
         return False
-    created_archive = file_path
     rsl = do_deploy(file_path)
     return rsl
