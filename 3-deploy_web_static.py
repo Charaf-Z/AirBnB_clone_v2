@@ -22,7 +22,8 @@ def do_pack():
     date = datetime.now().strftime("%Y%m%d%H%M%S")
     file_name = "versions/web_static_{}.tgz".format(date)
     try:
-        local("sudo mkdir -p versions")
+        if not exists('versions'):
+            local("sudo mkdir -p versions")
         local("sudo tar -cvzf {} web_static".format(file_name))
         return file_name
     except Exception:
@@ -70,7 +71,7 @@ def deploy():
         bool: True if the deployment process succeeds, False otherwise.
     """
     file_path = do_pack()
-    if exists(file_path) is False:
+    if not exists(file_path):
         return False
     rsl = do_deploy(file_path)
     return rsl
