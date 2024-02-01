@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 """Clean up old archives and releases in the web_static deployment."""
-from datetime import datetime
 import os
 from fabric.api import env, run, sudo, lcd, local, cd
 
@@ -19,12 +18,12 @@ def do_clean(number=0):
     """
     nbr = 1 if int(number) == 0 else int(number)
     archives = sorted(os.listdir("versions"))
-    [archives.pop() for i in range(number)]
+    [archives.pop() for i in range(nbr)]
     with lcd("versions"):
         [local("rm ./{}".format(file)) for file in archives]
 
     with cd("/data/web_static/releases"):
         archives = run("ls -tr").split()
         archives = [file for file in archives if "web_static_" in file]
-        [archives.pop() for i in range(number)]
+        [archives.pop() for i in range(nbr)]
         [sudo("rm -rf ./{}".format(file)) for file in archives]
