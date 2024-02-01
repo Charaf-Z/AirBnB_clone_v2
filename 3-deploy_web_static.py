@@ -1,13 +1,8 @@
 #!/usr/bin/python3
 """Automated deployment script for web_static content."""
+from fabric.api import *
 from datetime import datetime
-from fabric.api import env
-from fabric.api import put
-from fabric.api import run
-from fabric.api import local
 from os.path import exists
-from os.path import basename
-from os.path import isdir
 
 
 env.hosts = ["18.234.129.123", "52.3.244.13"]
@@ -75,7 +70,7 @@ def deploy():
         bool: True if the deployment process succeeds, False otherwise.
     """
     file_path = do_pack()
-    if exists(file_path) is None:
+    if exists(file_path) is False:
         return False
     rsl = do_deploy(file_path)
     return rsl
