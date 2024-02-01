@@ -25,7 +25,7 @@ def do_deploy(archive_path):
     if exists(archive_path) is False:
         return False
     file_name = basename(archive_path).split(".")[0]
-    file = f"/data/web_static/releases/{file_name}"
+    file = f"/data/web_static/releases/{file_name}/"
     tmp = f"/tmp/{file_name}.tgz"
 
     if put(archive_path, "/tmp/").failed is True:
@@ -34,7 +34,7 @@ def do_deploy(archive_path):
         return False
     if run("tar -xzf {} -C {}".format(tmp, file)).failed is True:
         return False
-    if run("rm -rf {}".format(tmp)).failed is True:
+    if run("rm {}".format(tmp)).failed is True:
         return False
     if run("mv {}/web_static/* {}/".format(file, file)).failed is True:
         return False
