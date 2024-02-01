@@ -59,21 +59,24 @@ def do_deploy(archive_path):
     file = "/data/web_static/releases/{}/".format(file_name)
     tmp = "/tmp/{}.tgz".format(file_name)
     try:
-        if put(archive_path, "/tmp/").failed if True:
+        if put(archive_path, "/tmp/").failed is True:
             return False
-        if run("mkdir -p {}".format(file)).failed if True:
+        if run("mkdir -p {}".format(file)).failed is True:
             return False
-        if run("tar -xzf {} -C {}".format(tmp, file)).failed if True:
+        if run("tar -xzf {} -C {}".format(tmp, file)).failed is True:
             return False
-        if run("rm {}".format(tmp)).failed if True:
+        if run("rm {}".format(tmp)).failed is True:
             return False
-        if run("mv {}web_static/* {}".format(file, file)).failed if True:
+        if run("mv {}web_static/* {}".format(file, file)).failed is True:
             return False
-        if run("rm -rf {}web_static".format(file)).failed if True:
+        if run("rm -rf {}web_static".format(file)).failed is True:
             return False
-        if run("rm -rf /data/web_static/current").failed if True:
+        if run("rm -rf /data/web_static/current").failed is True:
             return False
-        if run("ln -s {} /data/web_static/current".format(file)).failed if True:
+        if (
+            run("ln -s {} /data/web_static/current".format(file)).failed
+            is True
+        ):
             return False
         print("New version deployed!")
         return True
