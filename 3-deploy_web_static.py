@@ -49,7 +49,7 @@ def do_deploy(archive_path):
         return False
     if run("mkdir -p {}".format(file)).failed is True:
         return False
-    if run("tar -xzf {} -C {}".format(tmp, file)).failed is True:
+    if run("tar -xzf {}.tgz -C {}".format(tmp, file)).failed is True:
         return False
     if run("rm -rf {}".format(tmp)).failed is True:
         return False
