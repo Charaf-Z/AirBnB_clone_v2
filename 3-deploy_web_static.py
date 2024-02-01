@@ -4,6 +4,7 @@ from fabric.api import *
 from datetime import datetime
 from os.path import exists
 from os.path import basename
+from os.path import getsize
 
 
 env.hosts = ["18.234.129.123", "52.3.244.13"]
@@ -21,10 +22,12 @@ def do_pack():
     """
     date = datetime.now().strftime("%Y%m%d%H%M%S")
     file_name = "versions/web_static_{}.tgz".format(date)
+    print(f"Packing web_static to {file_name}")
     try:
         if not exists('versions'):
             local("sudo mkdir -p versions")
         local("sudo tar -cvzf {} web_static".format(file_name))
+        print(f"Packing web_static to: {file_name} -> {getsize(file_name)}")
         return file_name
     except Exception:
         return None
