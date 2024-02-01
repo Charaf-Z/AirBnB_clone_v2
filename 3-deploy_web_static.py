@@ -77,13 +77,7 @@ def deploy():
     Returns:
         bool: True if the deployment process succeeds, False otherwise.
     """
-    global created_arch
-    if created_arch is None:
-        file_path = do_pack()
-        if file_path is None:
-            return False
-        else:
-            created_arch = file_path
-        return do_deploy(file_path)
-    else:
-        return deploy(created_arch)
+    file_path = do_pack()
+    if exists(file_path) is None:
+        return False
+    return do_deploy(file_path)
