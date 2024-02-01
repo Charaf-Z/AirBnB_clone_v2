@@ -28,14 +28,20 @@ def do_deploy(archive_path):
     file = f"/data/web_static/releases/{file_name}"
     tmp = f"/tmp/{file_name}"
 
-    try:
-        put(archive_path, "/tmp/")
-        run("mkdir -p {}".format(file))
-        run("tar -xzf {} -C {}".format(tmp, file))
-        run("rm -rf {}".format(tmp))
-        run("mv {}/web_static/* {}/".format(file, file))
-        run("rm -rf /data/web_static/current")
-        run("ln -s {}/ /data/web_static/current".format(file))
-        return True
-    except Exception:
+    if put(archive_path, "/tmp/").failed is True:
         return False
+    if run("mkdir -p {}".format(file)).failed is True:
+        return False
+    if run("tar -xzf {} -C {}".format(tmp, file)).failed is True:
+        return False
+    if run("rm -rf {}".format(tmp)).failed is True:
+        return False
+    if run("mv {}/web_static/* {}/".format(file, file)).failed is True:
+        return False
+    if run("rm -rf /data/web_static/current").failed is True:
+        return False
+    if run("ln -s {}/ /data/web_static/current".format(file)).failed is True:
+        return False
+    print("New version deployed!")
+    return True
+
