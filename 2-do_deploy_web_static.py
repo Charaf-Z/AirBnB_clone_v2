@@ -38,6 +38,8 @@ def do_deploy(archive_path):
         return False
     if run("mv {}/web_static/* {}/".format(file, file)).failed is True:
         return False
+    if run("rm -rf {}/web_static".format(file)).failed is True:
+        return False
     if run("rm -rf /data/web_static/current").failed is True:
         return False
     if run("ln -s {}/ /data/web_static/current".format(file)).failed is True:
