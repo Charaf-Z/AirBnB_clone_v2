@@ -10,6 +10,7 @@ from os.path import getsize
 env.hosts = ["18.234.129.123", "52.3.244.13"]
 env.user = "ubuntu"
 env.key_filename = "~/.ssh/id_rsa_alx"
+created_archive = None
 
 
 def do_pack():
@@ -73,8 +74,11 @@ def deploy():
     Returns:
         bool: True if the deployment process succeeds, False otherwise.
     """
+    if created_archive is not None:
+        return do_deploy(created_archive)
     file_path = do_pack()
     if not exists(file_path):
         return False
+    created_archive = file_path
     rsl = do_deploy(file_path)
     return rsl
