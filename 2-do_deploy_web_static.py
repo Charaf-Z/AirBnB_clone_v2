@@ -3,6 +3,7 @@
 from fabric.api import env
 from fabric.api import put
 from fabric.api import run
+from os.path import basename
 from os.path import exists
 
 
@@ -23,19 +24,19 @@ def do_deploy(archive_path):
     """
     if exists(archive_path) is False:
         return False
-    filename = archive_path.split("/")[-1]
-    no_tgz = "/data/web_static/releases/" + "{}".format(filename.split(".")[0])
-    tmp = "/tmp/" + filename
-
+    file_name = basename(archive_path).split(".")[0]
+    file = "/data/web_static/releases/{}/".format(file_name)
+    tmp = "/tmp/{}.tgz".format(file_name)
     try:
         put(archive_path, "/tmp/")
-        run("mkdir -p {}/".format(no_tgz))
-        run("tar -xzf {} -C {}/".format(tmp, no_tgz))
+        run("mkdir -p {}".format(file))
+        run("tar -xzf {} -C {}".format(tmp, file))
         run("rm {}".format(tmp))
-        run("mv {}/web_static/* {}/".format(no_tgz, no_tgz))
-        run("rm -rf {}/web_static".format(no_tgz))
+        run("mv {}/web_static/* {}/".format(file, file))
+        run("rm -rf {}/web_static".format(file))
         run("rm -rf /data/web_static/current")
-        run("ln -s {}/ /data/web_static/current".format(no_tgz))
+        run("ln -s {} /data/web_static/current".format(file))
+        print("New version deployed!")
         return True
     except Exception:
         return False
