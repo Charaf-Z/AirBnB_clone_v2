@@ -22,7 +22,7 @@ def do_pack():
     """
     date = datetime.now().strftime("%Y%m%d%H%M%S")
     file_name = "versions/web_static_{}.tgz".format(date)
-    if isdir("version") is False:
+    if isdir("versions") is False:
         if local("mkdir -p versions").failed is False:
             return None
     if local("tar -cvzf {} web_static".format(file_name)).failed is True:
