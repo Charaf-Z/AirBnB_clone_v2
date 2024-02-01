@@ -29,8 +29,10 @@ def do_pack():
     print(f"Packing web_static to {file_name}")
     try:
         if not exists("versions"):
-            local("mkdir -p versions")
-        local("tar -cvzf {} web_static".format(file_name))
+            if local("mkdir -p versions").failed is True:
+                return None
+        if local("tar -cvzf {} web_static".format(file_name)).failed is True:
+            return None
         print(f"web_static packed: {file_name} -> {getsize(file_name)}Bytes")
         created_archive = file_name
         return file_name
@@ -57,14 +59,22 @@ def do_deploy(archive_path):
     file = "/data/web_static/releases/{}/".format(file_name)
     tmp = "/tmp/{}.tgz".format(file_name)
     try:
-        put(archive_path, "/tmp/")
-        run("mkdir -p {}".format(file))
-        run("tar -xzf {} -C {}".format(tmp, file))
-        run("rm {}".format(tmp))
-        run("mv {}web_static/* {}".format(file, file))
-        run("rm -rf {}web_static".format(file))
-        run("rm -rf /data/web_static/current")
-        run("ln -s {} /data/web_static/current".format(file))
+        if put(archive_path, "/tmp/").failed if True:
+            return False
+        if run("mkdir -p {}".format(file)).failed if True:
+            return False
+        if run("tar -xzf {} -C {}".format(tmp, file)).failed if True:
+            return False
+        if run("rm {}".format(tmp)).failed if True:
+            return False
+        if run("mv {}web_static/* {}".format(file, file)).failed if True:
+            return False
+        if run("rm -rf {}web_static".format(file)).failed if True:
+            return False
+        if run("rm -rf /data/web_static/current").failed if True:
+            return False
+        if run("ln -s {} /data/web_static/current".format(file)).failed if True:
+            return False
         print("New version deployed!")
         return True
     except Exception:
