@@ -3,12 +3,13 @@
 from fabric.api import *
 from datetime import datetime
 from os.path import exists
+from os.path import isdir
+from os.path import basename
 
 
 env.hosts = ["18.234.129.123", "52.3.244.13"]
 env.user = "ubuntu"
 env.key_filename = "~/.ssh/id_rsa_alx"
-created_arch = None
 
 
 def do_pack():
