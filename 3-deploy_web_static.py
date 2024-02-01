@@ -21,11 +21,12 @@ def do_pack():
     """
     date = datetime.now().strftime("%Y%m%d%H%M%S")
     file_name = "versions/web_static_{}.tgz".format(date)
-    if local("sudo mkdir -p versions").failed is True:
+    try:
+        local("sudo mkdir -p versions")
+        local("sudo tar -cvzf {} web_static".format(file_name))
+        return file_name
+    except Exception:
         return None
-    if local("sudo tar -cvzf {} web_static".format(file_name)).failed is True:
-        return None
-    return file_name
 
 
 def do_deploy(archive_path):
