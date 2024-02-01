@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """Automated deployment script for web_static content."""
 from datetime import datetime
-from os.path import exists, basename
+from os.path import isfile, basename
 from fabric.api import local, env, put, run
 
 env.hosts = ["18.234.129.123", "52.3.244.13"]
@@ -39,7 +39,7 @@ def do_deploy(archive_path):
     Raises:
         Exception: If an error occurs during the deployment process.
     """
-    if exists(archive_path) is False:
+    if isfile(archive_path) is False:
         return False
     file_name = basename(archive_path).split(".")[0]
     file = f"/data/web_static/releases/{file_name}/"
@@ -47,13 +47,15 @@ def do_deploy(archive_path):
 
     if put(archive_path, "/tmp/").failed is True:
         return False
+    if run("rm -rf {}".format(file)).failed is True:
+        return False
     if run("mkdir -p {}".format(file)).failed is True:
         return False
     if run("tar -xzf {} -C {}".format(tmp, file)).failed is True:
         return False
     if run("rm {}".format(tmp)).failed is True:
         return False
-    if run("mv {}/web_static/* {}".format(file, file)).failed is True:
+    if run("mv {}/web_static/* {}/".format(file, file)).failed is True:
         return False
     if run("rm -rf {}/web_static".format(file)).failed is True:
         return False
