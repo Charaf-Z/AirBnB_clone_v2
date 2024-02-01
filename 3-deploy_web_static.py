@@ -2,7 +2,7 @@
 """Automated deployment script for web_static content."""
 from datetime import datetime
 from os.path import exists, basename
-from fabric.api import local, env, put, run, sudo
+from fabric.api import local, env, put, run
 
 env.hosts = ["18.234.129.123", "52.3.244.13"]
 env.user = "ubuntu"
@@ -47,12 +47,12 @@ def do_deploy(archive_path):
 
     try:
         put(archive_path, "/tmp/")
-        sudo("mkdir -p {}".format(file))
+        run("mkdir -p {}".format(file))
         run("tar -xzf {} -C {}".format(tmp, file))
-        sudo("rm -rf {}".format(tmp))
+        run("rm -rf {}".format(tmp))
         run("mv {}/web_static/* {}/".format(file, file))
-        sudo("rm -rf /data/web_static/current")
-        sudo("ln -s {}/ /data/web_static/current".format(file))
+        run("rm -rf /data/web_static/current")
+        run("ln -s {}/ /data/web_static/current".format(file))
         return True
     except Exception:
         return False
@@ -69,4 +69,3 @@ def deploy():
     if file_path is None:
         return False
     return do_deploy(file_path)
-
