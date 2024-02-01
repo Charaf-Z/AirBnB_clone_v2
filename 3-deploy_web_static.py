@@ -8,6 +8,7 @@ from fabric.api import local
 from os.path import isfile
 from os.path import basename
 from os.path import isdir
+from os.path import getsize
 
 
 env.hosts = ["18.234.129.123", "52.3.244.13"]
@@ -26,12 +27,13 @@ def do_pack():
     """
     date = datetime.now().strftime("%Y%m%d%H%M%S")
     file_name = "versions/web_static_{}.tgz".format(date)
+    print(f"Packing web_static to {file_name}")
     if isdir("version") is False:
         if local("mkdir -p versions").failed is False:
             return None
     if local("tar -cvzf {} web_static".format(file_name)).failed is True:
         return None
-    print("Packing web_static to {}")
+    print(f"Packing web_static to: {file_name} -> {getsize(file_name)}")
     return file_name
 
 
