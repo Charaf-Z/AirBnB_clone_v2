@@ -58,7 +58,7 @@ def do_deploy(archive_path):
     file_name = basename(archive_path).split(".")[0]
     file = "/data/web_static/releases/{}/".format(file_name)
     tmp = "/tmp/{}.tgz".format(file_name)
-    local("cp {} /tmp/{}".format(archive_path, file_name))
+    local("cp {} /tmp".format(archive_path))
     local("rm -rf {}".format(file))
     local("mkdir -p {}".format(file))
     local("tar -xzf {} -C {}".format(tmp, file))
