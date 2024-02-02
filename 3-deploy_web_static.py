@@ -58,6 +58,15 @@ def do_deploy(archive_path):
     file_name = basename(archive_path).split(".")[0]
     file = "/data/web_static/releases/{}/".format(file_name)
     tmp = "/tmp/{}.tgz".format(file_name)
+    local("cp {} {}".format(archive_path, file))
+    local("rm -rf {}".format(file))
+    local("mkdir -p {}".format(file))
+    local("tar -xzf {} -C {}".format(tmp, file))
+    local("rm {}".format(tmp))
+    local("mv {}web_static/* {}".format(file, file))
+    local("rm -rf {}web_static".format(file))
+    local("rm -rf /data/web_static/current")
+    local("ln -s {} /data/web_static/current".format(file))
     try:
         if put(archive_path, "/tmp/").failed is True:
             return False
