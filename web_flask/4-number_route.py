@@ -55,7 +55,8 @@ def python_route(text: str = "is cool") -> str:
     """
     return "Python {}".format(text.replace("_", " "))
 
-@app.route('/number/<int:n>', strict_slashes=False)
+
+@app.route("/number/<int:n>", strict_slashes=False)
 def number(n: int) -> str:
     """
     Route that displays a message indicating the input is a number.
