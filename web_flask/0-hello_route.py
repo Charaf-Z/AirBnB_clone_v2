@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 
 @app.route("/", strict_slashes=False)
-def hello() -> str:
+def hello():
     """
     Greet users with 'Hello HBNB!'.
 
