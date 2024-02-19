@@ -1,50 +1,165 @@
 #!/usr/bin/python3
-"""State Module for HBNB project."""
+"""Place Module for HBNB project."""
 import os
-from sqlalchemy import Column, String
+from sqlalchemy import Column, Float, ForeignKey, Integer, String, Table
 from sqlalchemy.orm import relationship
 from models.base_model import BaseModel, Base
-from models.city import City
+from models.review import Review
+from models.amenity import Amenity
 
 
-class State(BaseModel, Base):
+place_amenity = Table(
+    "place_amenity",
+    Base.metadata,
+    Column(
+        "place_id",
+        String(60),
+        ForeignKey("places.id"),
+        nullable=False,
+        primary_key=True,
+    ),
+    Column(
+        "amenity_id",
+        String(60),
+        ForeignKey("amenities.id"),
+        nullable=False,
+        primary_key=True,
+    ),
+)
+
+"""
+Represents the many to many relationship table
+between Place and Amenity records.
+"""
+
+
+class Place(BaseModel, Base):
     """
-    State class inherits from BaseModel and Base.
+    A place to stay.
 
-    The State class represents a state in the HBNB project.
-    In a database setup, State objects are stored in the 'states' table.
+    The Place class inherits from BaseModel and is used to represent places
+    to stay in the HBNB project. In a database setup,
+    Place objects are stored in the 'places' table.
 
     Attributes:
-        id (str): Unique identifier for the State.
-        created_at (datetime): The datetime when the State instance
+        id (str): Unique identifier for the Place.
+        created_at (datetime): The datetime when the Place instance
                 was created.
-        updated_at (datetime): The datetime when the State instance
+        updated_at (datetime): The datetime when the Place instance
                 was last updated.
-        name (str): The name of the State.
-        cities (relationship): One-to-many relationship with the City class,
-                representing cities associated with the state.
+        city_id (str): The foreign key linking the Place to a City.
+        user_id (str): The foreign key linking the Place to a User.
+        name (str): The name of the Place.
+        description (str): A description of the Place.
+        number_rooms (int): The number of rooms in the Place.
+        number_bathrooms (int): The number of bathrooms in the Place.
+        max_guest (int): The maximum number of guests the Place
+                can accommodate.
+        price_by_night (int): The price per night for the Place.
+        latitude (float): The latitude coordinate of the Place.
+        longitude (float): The longitude coordinate of the Place.
+        amenity_ids (list): A list of amenity IDs associated
+                with the Place (file-based storage only).
+        reviews (relationship): One-to-many relationship with the Review class,
+                representing reviews associated with the place.
+        amenities (relationship): Many-to-many relationship
+                with the Amenity class, representing amenities
+                associated with the place.
     """
 
-    __tablename__ = "states"
+    __tablename__ = "places"
+    city_id = (
+        Column(String(60), ForeignKey("cities.id"), nullable=False)
+        if os.getenv("HBNB_TYPE_STORAGE") == "db"
+        else ""
+    )
+    user_id = (
+        Column(String(60), ForeignKey("users.id"), nullable=False)
+        if os.getenv("HBNB_TYPE_STORAGE") == "db"
+        else ""
+    )
     name = (
         Column(String(128), nullable=False)
         if os.getenv("HBNB_TYPE_STORAGE") == "db"
         else ""
     )
-
+    description = (
+        Column(String(1024), nullable=True)
+        if os.getenv("HBNB_TYPE_STORAGE") == "db"
+        else ""
+    )
+    number_rooms = (
+        Column(Integer, nullable=False, default=0)
+        if os.getenv("HBNB_TYPE_STORAGE") == "db"
+        else 0
+    )
+    number_bathrooms = (
+        Column(Integer, nullable=False, default=0)
+        if os.getenv("HBNB_TYPE_STORAGE") == "db"
+        else 0
+    )
+    max_guest = (
+        Column(Integer, nullable=False, default=0)
+        if os.getenv("HBNB_TYPE_STORAGE") == "db"
+        else 0
+    )
+    price_by_night = (
+        Column(Integer, nullable=False, default=0)
+        if os.getenv("HBNB_TYPE_STORAGE") == "db"
+        else 0
+    )
+    latitude = (
+        Column(Float, nullable=True)
+        if os.getenv("HBNB_TYPE_STORAGE") == "db"
+        else 0.0
+    )
+    longitude = (
+        Column(Float, nullable=True)
+        if os.getenv("HBNB_TYPE_STORAGE") == "db"
+        else 0.0
+    )
+    amenity_ids = []
+    reviews = (
+        relationship(
+            "Review", cascade="all, delete, delete-orphan", backref="place"
+        )
+        if os.getenv("HBNB_TYPE_STORAGE") == "db"
+        else None
+    )
     if os.getenv("HBNB_TYPE_STORAGE") == "db":
-        cities = relationship(
-            "City", cascade="all, delete, delete-orphan", backref="state"
+        amenities = relationship(
+            "Amenity",
+            secondary=place_amenity,
+            viewonly=False,
+            backref="place_amenities",
         )
     else:
 
         @property
-        def cities(self):
-            """Returns the cities in this State instance."""
+        def amenities(self):
+            """Returns the amenities of this Place."""
             from models import storage
 
-            cities_in_state = []
-            for value in storage.all(City).values():
-                if value.state_id == self.id:
-                    cities_in_state.append(value)
-            return cities_in_state
+            amenities_of_place = []
+            for value in storage.all(Amenity).values():
+                if value.id in self.amenity_ids:
+                    amenities_of_place.append(value)
+            return amenities_of_place
+
+        @amenities.setter
+        def amenities(self, value):
+            """Add an amenity to this Place."""
+            if type(value) is Amenity:
+                if value.id not in self.amenity_ids:
+                    self.amenity_ids.append(value.id)
+
+        @property
+        def reviews(self):
+            """Returns the reviews of this Place."""
+            from models import storage
+
+            reviews_of_place = []
+            for value in storage.all(Review).values():
+                if value.place_id == self.id:
+                    reviews_of_place.append(value)
+            return reviews_of_place
