@@ -3,9 +3,6 @@
 from flask import Flask, render_template
 from models import storage
 from models.state import State
-import warnings
-
-warnings.filterwarnings("ignore")
 
 app = Flask(__name__)
 
