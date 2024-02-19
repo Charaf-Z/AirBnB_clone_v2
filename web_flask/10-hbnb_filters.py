@@ -3,6 +3,7 @@
 
 from flask import Flask, render_template
 from models import storage
+from models.state import State
 
 app = Flask(__name__)
 
@@ -10,7 +11,7 @@ app = Flask(__name__)
 @app.route("/hbnb_filters", strict_slashes=False)
 def filters():
     """Render a template to display filters for searching listings."""
-    states = storage.all("State").values()
+    states = storage.all(State).values()
     amenities = storage.all("Amenity").values()
     return render_template(
         "10-hbnb_filters.html", states=states, amenities=amenities

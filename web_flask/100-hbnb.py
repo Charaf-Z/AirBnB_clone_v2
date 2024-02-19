@@ -3,6 +3,7 @@
 
 from flask import Flask, render_template, Markup
 from models import storage
+from models.state import State
 
 app = Flask(__name__)
 
@@ -10,7 +11,7 @@ app = Flask(__name__)
 @app.route("/hbnb", strict_slashes=False)
 def states_cities_list():
     """Display a list of states and cities along with amenities and places."""
-    states = list(storage.all("State").values())
+    states = list(storage.all(State).values())
     states.sort(key=lambda x: x.name)
     for state in states:
         state.cities.sort(key=lambda x: x.name)

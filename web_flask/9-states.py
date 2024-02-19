@@ -3,6 +3,7 @@
 
 from flask import Flask, render_template
 from models import storage
+from models.state import State
 
 app = Flask(__name__)
 
@@ -16,7 +17,7 @@ def states(state_id=None):
     Args:
         state_id (str): The ID of the state to display details for.
     """
-    states = storage.all("State")
+    states = storage.all(State)
     if state_id is not None:
         state_id = "State." + state_id
     return render_template("9-states.html", states=states, id=state_id)
