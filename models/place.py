@@ -90,7 +90,7 @@ class Place(BaseModel, Base):
         backref="place_amenities",
     )
 
-    if os.getenv("HBNB_TYPE_STORAGE") != "db":
+    if os.getenv("HBNB_TYPE_STORAGE", None) == "db":
 
         @property
         def amenities(self):
