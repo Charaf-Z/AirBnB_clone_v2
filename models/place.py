@@ -8,7 +8,7 @@ from models.review import Review
 from models.amenity import Amenity
 
 
-if os.getenv("HBNB_TYPE_STORAGE") == "db":
+if os.getenv("HBNB_TYPE_STORAGE", None) == "db":
     place_amenity = Table(
         "place_amenity",
         Base.metadata,
@@ -90,7 +90,7 @@ class Place(BaseModel, Base):
         backref="place_amenities",
     )
 
-    if os.getenv("HBNB_TYPE_STORAGE", None) == "db":
+    if os.getenv("HBNB_TYPE_STORAGE", None) != "db":
 
         @property
         def amenities(self):
