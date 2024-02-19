@@ -9,13 +9,19 @@ app = Flask(__name__)
 
 
 @app.route("/states", strict_slashes=False)
+def states():
+    """Route handler for displaying information about states."""
+    states = storage.all(State)
+    return render_template("9-states.html", states=states)
+
+
 @app.route("/states/<state_id>", strict_slashes=False)
-def states(state_id=None):
+def state_id(state_id=None):
     """
-    Display a list of states or details of a specific state.
+    Route handler for displaying information about a specific state.
 
     Args:
-        state_id (str): The ID of the state to display details for.
+        state_id (str, optional): The ID of the specific state.
     """
     states = storage.all(State)
     if state_id is not None:
