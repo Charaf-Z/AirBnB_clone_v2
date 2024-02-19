@@ -2,6 +2,9 @@
 """HBNB Flask application."""
 from flask import Flask, render_template
 from models import storage
+import warnings
+
+warnings.filterwarnings("ignore")
 
 app = Flask(__name__)
 
